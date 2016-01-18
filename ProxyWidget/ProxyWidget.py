@@ -3,9 +3,8 @@ import platform
 import tkinter as tk 
 from tkinter import ttk
 import tkinter.messagebox
-import socks 
 import ssh
-
+import socks
 #Global variables
 interface_name = 'Wi-Fi'
 hostname = '104.131.190.99'
@@ -13,7 +12,6 @@ ssh_id_file = '/Users/awensaunders/.ssh/digitalocean.pem'
 sshport = 22
 port = 1080
 user = 'root'
-print('hello')
 
 #Main app logic
 class Application(ttk.Frame):
