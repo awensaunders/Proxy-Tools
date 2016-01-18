@@ -8,7 +8,7 @@ List of Features
 ================
 
 - Supports SSH Tunneling 
-- Can change proxy settings 
+- Can change proxy settings (done)
 - Hostnames not hardcoded
 - Can change ports for proxy
 - Pretty GUI

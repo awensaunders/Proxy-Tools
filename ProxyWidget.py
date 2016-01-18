@@ -1,60 +1,86 @@
 #!/usr/bin/env python3
-import os
-import subprocess
+import platform
 import tkinter as tk 
 from tkinter import ttk
 import tkinter.messagebox
+import socks 
+import ssh
 
 #Global variables
 interface_name = 'Wi-Fi'
 hostname = '104.131.190.99'
-ssh_id_file = '~/.ssh/digitalocean.pem'
+ssh_id_file = '/Users/awensaunders/.ssh/digitalocean.pem'
+sshport = 22
 port = 1080
+user = 'root'
 
+
+#Main app logic
 class Application(ttk.Frame):
     def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
-        self.pack(fill = 'both', expand = 1, ipadx=50)
+        ttk.Frame.__init__(self, master)
+        self.pack(fill = 'both', expand = 1)
         self.mainWindowWidgets()
     def mainWindowWidgets(self):
-        self.quitButton = ttk.Button(self, text = 'Quit', command = self.quit)
-        self.proxyOnButton = ttk.Button(self, text = 'Proxy On', command = proxy_on)
-        self.proxyOffButton = ttk.Button(self, text = 'Proxy Off', command = proxy_off)
-        self.proxyOnButton.pack(fill = 'x')
-        self.proxyOffButton.pack(fill = 'x')
-        self.quitButton.pack(fill = 'x')
+        self.quitButton = ttk.Button(self, text = 'Quit', command = self.quit, width = 8)
+        self.proxyOnButton = ttk.Button(self, text = 'Proxy On', command = self.proxy_on, width = 8)
+        self.proxyOffButton = ttk.Button(self, text = 'Proxy Off', command = self.proxy_off, width = 8)
+        self.optionsButton = ttk.Button(self, text = 'Options', command = self.spawnOptionsWindow, width = 8)
+        self.proxyOnButton.pack()
+        self.proxyOffButton.pack()
+        self.optionsButton.pack()
+        self.quitButton.pack()
+        if pro.is_proxy_on() == True:
+            self.proxyOnButton['state'] = 'disabled'
+            self.proxyOffButton['state'] = 'enabled'
+        elif pro.is_proxy_on() == False:
+            self.proxyOnButton['state'] = 'enabled'
+            self.proxyOffButton['state'] = 'disabled'
+        else:
+            tk.messagebox.showerror("Error", "The current state of the proxy could not be determined. ")
+    def spawnOptionsWindow(self):
+        self.optionsWindow = tk.Toplevel(self.master)
+        self.optionsFrame = ttk.Frame(self.optionsWindow)
+        self.optionsFrame.pack(fill = 'both', expand = 1)
+        self.portLabel = ttk.Label(self.optionsFrame, text = 'Port Number:', width = 10)
+        self.portNumberEntry = ttk.Entry(self.optionsFrame, width = 8)
+        self.portNumberEntry.insert(0, port)
+        self.portLabel.pack(side = 'left', fill = 'y')
+        self.HostLabel = ttk.Label(self.optionsWindow, text = 'Hostname', width = 10)
+        #self.portNumberEntry.pack(side = 'left')
+        self.applyButton = ttk.Button(self.optionsWindow, text = 'Apply', command = self.apply_options, width = 4)
+        self.HostLabel.pack(side = 'bottom')
+        self.applyButton.pack(side = 'bottom')
+    def apply_options(self):
+        port = int(self.portNumberEntry.get())
+        print('Port Number:', port)
+    def proxy_on(self):
+        pro.proxy_on()
+        self.proxyOnButton['state'] = 'disabled'
+        self.proxyOffButton['state'] = 'enabled'
+        ssh_tunnel.start_tunnel(user, hostname, sshport, port, ssh_id_file)
+    def proxy_off(self):
+        ssh_tunnel.stop_tunnel()
+        pro.proxy_off()
+        self.proxyOffButton['state'] = 'disabled'
+        self.proxyOnButton['state'] = 'enabled'
+        
+        
 
-def is_proxy_on():
-    raw = subprocess.check_output(['networksetup', '-getsocksfirewallproxy', interface_name])
-    state = raw.split()[1].decode()
-    if state == 'Yes':
-        return True
-    elif state == 'No':
-        return False
+#Initialise an instance of the ProxyTools class
+pro = socks.ProxyTools(interface_name)
+#Initialise an instance of the ssh tunnel class
+ssh_tunnel = ssh.Tunnel()
+#start the application if main
+if __name__ == '__main__':
+    if platform.system() != 'Darwin':
+        tk.messagebox.showerror("Error", "Unfortunately your operating system is not supported. If you wish to contribute to the development of a port, visit the github repository for this project.")
     else:
-        return 'Error'
-    
-def proxy_on():
-    subprocess.call(['networksetup', '-setsocksfirewallproxystate', interface_name, 'on'])
-    
-def proxy_off():
-    subprocess.call(['networksetup', '-setsocksfirewallproxystate', interface_name, 'off'])
-    
-def set_SOCKS_port(port):
-    subprocess.call(['networksetup', '-setsocksfirewallproxy', interface_name, 'localhost', port, 'off'])
+        #Initialise the application
+        app = Application()
 
-#Initialise the application
-app = Application()
-#Method calls for window management
-app.master.title("Proxy Widget")
-app.master.maxsize(400, 400)
-#start the application
-app.mainloop()
-
-
-        
-        
-
-
-        
-        
+        #Method calls for window management
+        app.master.title("Proxy Widget")
+        app.master.maxsize(400, 400)
+        #start the application
+        app.mainloop()
