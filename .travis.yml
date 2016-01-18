@@ -17,5 +17,6 @@ deploy:
   file: dist/ProxyTools.dmg
   skip_cleanup: true
   on:
+    branch: master
     tags: true
     repo: awensaunders/Proxy-Tools
