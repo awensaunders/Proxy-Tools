@@ -3,8 +3,8 @@ import platform
 import tkinter as tk 
 from tkinter import ttk
 import tkinter.messagebox
-from lib import ssh 
-from lib import socks
+from modules import ssh 
+from modules import socks
 
 #Global variables
 interface_name = 'Wi-Fi'

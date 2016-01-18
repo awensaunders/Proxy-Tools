@@ -2,9 +2,9 @@
 import pytest
 import subprocess
 import sys
+from modules import ssh 
+from modules import socks
 import ProxyWidget
-from lib import ssh 
-from lib import socks
 
 class TestSOCKS: 
     @pytest.fixture
