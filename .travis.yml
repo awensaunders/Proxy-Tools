@@ -7,7 +7,7 @@ install:
 - python3 --version
 - pip3 install -r dependencies.txt
 script: py.test-3.5
-before_deploy:
+after_success:
 - python3 setup.py py2app
 - hdiutil create dist/ProxyTools.dmg -srcfolder dist/ -ov 
 deploy:
@@ -17,4 +17,5 @@ deploy:
   file: dist/ProxyTools.dmg
   skip_cleanup: true
   on:
+    tags: true
     repo: awensaunders/Proxy-Tools
