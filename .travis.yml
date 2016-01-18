@@ -1,16 +1,20 @@
 language: objective-c
-python:
-  - "3.5"
-#install deps
 before_install:
-	- brew update
-	- brew install python3 
-	- which python3 
-	- brew install python
-	- which pip3 
-	- python3 --version 
-	- pip3 install -r dependencies.txt
-#run tests
+- brew update
+- brew install python3
+- which python3
+- which pip3
+- python3 --version
+- pip3 install -r dependencies.txt
 script: py.test-3.5
-
-install: python3 setup.py py2app 
+install:
+- python3 setup.py py2app
+- hdiutil create dist/ProxyTools.dmg -srcfolder dist/ -ov
+deploy:
+  provider: releases
+  api_key:
+    secure: QmoY74M4A2KTBzIpyaST2pWi29kHnP+QVI7PJiJttSHZLMTFFTJ94efhKbtZXpa0oTJi4kD9ov33J8K+TULSCUW+ttj2tzNlXrKujx7k6lJiPQ0MW4ZYhgPo9LcJSj212CUdF4Zmzw4N3GNlpGLh2CYa4AYQUSzt2rFP0rxXW33R4A3mDA/p3sa7OQLq/qsov6jkyjKw3ZcCM97OwHRKP0Ms/HjuFMgDfqDvAuZzc6ZIH5nbm8HEucD9kCfZmFoMYweTOcPi7PyYUJfIAlMQ06ltV6CFgqC1npZHiDsBb/S5mtM9+nAt4lgC4qsEiI0IJ5exT5XHzkTJ84M9eylaSOKErOElL3c2f0j/zEA8eAbisMYxQQNMmApEnrhBDOv18aYFYq4HC1tA8nwjKCfyZ9uwp8xY8ZwY7W2OVMksd/HLRRw3lJmfpw6PI3KG7YHtgZopLIWZxZ8hmrgLPT7vDdZjM2P0ZJm4LsgJKS5W0fyueeBw2OxyUH9G3DDXuXddxLJzxUe9ZkM2/uTPyzh4YyjeirLDSbTH61fVIuSJTqoblLq5JuzLV13qzzIa1k0Sa4KsTmPzZwHuHRChE9fR22wksvCOdpKGU3yaZlCWFy6Jjr80SbZ089VK59CfV5SIic9U0NilhrKfHxHkRFot0QIpUp5Yrwwq1erulBeGVIY=
+  file: dist/ProxyTools.dmg
+  skip_cleanup: true
+  on:
+    repo: awensaunders/Proxy-Tools
