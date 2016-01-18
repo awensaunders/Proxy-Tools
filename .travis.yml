@@ -4,4 +4,4 @@ python:
 #install deps
 install: "pip3 install -r dependencies.txt"
 #run tests
-script: 'py.test'
+script: 'py.test-3.5'
