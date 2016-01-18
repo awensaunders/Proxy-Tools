@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import pytest
 import subprocess
-from ProxyWidget import ProxyWidget
-from ProxyWidget import ssh
-from ProxyWidget import socks
+import sys
+import ProxyWidget
+from lib import ssh 
+from lib import socks
 
 class TestSOCKS: 
     @pytest.fixture

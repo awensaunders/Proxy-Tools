@@ -7,7 +7,7 @@ Usage:
 
 from setuptools import setup
 
-APP = ['ProxyWidget/ProxyWidget.py']
+APP = ['ProxyWidget.py']
 DATA_FILES = []
 OPTIONS = {'argv_emulation': True}
 
