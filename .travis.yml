@@ -1,5 +1,5 @@
 language: objective-c
-before_install:
+install:
 - brew update
 - brew install python3
 - which python3
@@ -7,9 +7,9 @@ before_install:
 - python3 --version
 - pip3 install -r dependencies.txt
 script: py.test-3.5
-install:
+before_deploy:
 - python3 setup.py py2app
-- hdiutil create dist/ProxyTools.dmg -srcfolder dist/ -ov
+- hdiutil create dist/ProxyTools.dmg -srcfolder dist/ -ov 
 deploy:
   provider: releases
   api_key:
