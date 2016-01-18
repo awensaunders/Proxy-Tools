@@ -1,0 +1,7 @@
+language: python
+python:
+  - "3.5"
+#install deps
+install: "pip install -r dependencies.txt"
+#run tests
+script: 'py.test'

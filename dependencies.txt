@@ -1,0 +1,4 @@
+py==1.4.31
+pytest==2.8.5
+pytest-pythonpath==0.7
+wheel==0.24.0
