@@ -13,13 +13,13 @@ ssh_id_file = '/Users/awensaunders/.ssh/digitalocean.pem'
 sshport = 22
 port = 1080
 user = 'root'
-
+print('hello')
 
 #Main app logic
 class Application(ttk.Frame):
     def __init__(self, master=None):
         ttk.Frame.__init__(self, master)
-        self.pack(fill = 'both', expand = 1)
+        self.pack(fill = 'both', expand = 1, ipadx = 1, ipady = 1)
         self.mainWindowWidgets()
     def mainWindowWidgets(self):
         self.quitButton = ttk.Button(self, text = 'Quit', command = self.quit, width = 8)
@@ -38,22 +38,30 @@ class Application(ttk.Frame):
             self.proxyOffButton['state'] = 'disabled'
         else:
             tk.messagebox.showerror("Error", "The current state of the proxy could not be determined. ")
+   
     def spawnOptionsWindow(self):
         self.optionsWindow = tk.Toplevel(self.master)
         self.optionsFrame = ttk.Frame(self.optionsWindow)
-        self.optionsFrame.pack(fill = 'both', expand = 1)
-        self.portLabel = ttk.Label(self.optionsFrame, text = 'Port Number:', width = 10)
-        self.portNumberEntry = ttk.Entry(self.optionsFrame, width = 8)
+        self.optionsFrame.pack(fill = 'both', expand = 1, ipadx = 1, ipady = 1)
+        self.portLabel = ttk.Label(self.optionsFrame, text = 'Port Number:')
+        self.portNumberEntry = ttk.Entry(self.optionsFrame)
         self.portNumberEntry.insert(0, port)
-        self.portLabel.pack(side = 'left', fill = 'y')
-        self.HostLabel = ttk.Label(self.optionsWindow, text = 'Hostname', width = 10)
-        #self.portNumberEntry.pack(side = 'left')
-        self.applyButton = ttk.Button(self.optionsWindow, text = 'Apply', command = self.apply_options, width = 4)
-        self.HostLabel.pack(side = 'bottom')
-        self.applyButton.pack(side = 'bottom')
+        self.portLabel.pack(anchor = "w")
+        self.portNumberEntry.pack()
+        
+        self.hostLabel = ttk.Label(self.optionsFrame, text = 'Hostname:')
+        self.hostnameEntry = ttk.Entry(self.optionsFrame)
+        self.hostnameEntry.insert(0, hostname)
+        self.hostLabel.pack(anchor = "w")
+        self.hostnameEntry.pack()
+        
+        self.applyButton = ttk.Button(self.optionsFrame, text = 'Apply', command = self.apply_options, width = 4)
+        self.applyButton.pack()
     def apply_options(self):
         port = int(self.portNumberEntry.get())
         print('Port Number:', port)
+        hostname = self.hostnameEntry.get()
+        print('Hostname:', hostname)
     def proxy_on(self):
         pro.proxy_on()
         self.proxyOnButton['state'] = 'disabled'
