@@ -1,17 +1,14 @@
 #!/usr/bin/env python3
 import platform
-import tkinter as tk 
+import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox
-from modules import ssh 
+from modules import ssh
 from modules import socks
 from modules import configurator
 
 #Global variables
 
-
-
-    
 #Main app logic
 class Application(ttk.Frame):
     def __init__(self, master=None):
@@ -35,11 +32,17 @@ class Application(ttk.Frame):
             self.proxyOffButton['state'] = 'disabled'
         else:
             tk.messagebox.showerror("Error", "The current state of the proxy could not be determined. ")
-   
+    
     def spawnOptionsWindow(self):
         self.optionsWindow = tk.Toplevel(self.master)
         self.optionsFrame = ttk.Frame(self.optionsWindow)
         self.optionsFrame.pack(fill = 'both', expand = 1, ipadx = 1, ipady = 1)
+        
+        self.interfaceLabel = ttk.Label(self.optionsFrame, text = 'Interface:')
+        self.interfaceEntry = ttk.Entry(self.optionsFrame)
+        self.interfaceEntry.insert(0, config['interface'])
+        self.interfaceLabel.pack(anchor = "w")
+        self.interfaceEntry.pack()
         
         self.portLabel = ttk.Label(self.optionsFrame, text = 'Local Port:')
         self.portNumberEntry = ttk.Entry(self.optionsFrame)
@@ -53,6 +56,12 @@ class Application(ttk.Frame):
         self.sshPortLabel.pack(anchor = "w")
         self.sshPortEntry.pack()
         
+        self.userLabel = ttk.Label(self.optionsFrame, text = 'SSH User:')
+        self.userEntry = ttk.Entry(self.optionsFrame)
+        self.userEntry.insert(0, config['user'])
+        self.userLabel.pack(anchor = "w")
+        self.userEntry.pack()
+        
         self.hostnameLabel = ttk.Label(self.optionsFrame, text = 'Hostname:')
         self.hostnameEntry = ttk.Entry(self.optionsFrame)
         self.hostnameEntry.insert(0, config['hostname'])
@@ -62,10 +71,14 @@ class Application(ttk.Frame):
         self.applyButton = ttk.Button(self.optionsFrame, text = 'Apply', command = self.apply_options, width = 4)
         self.applyButton.pack()
     def apply_options(self):
+        config['interface'] = self.interfaceEntry.get()
+        print('Interface:', config['interface'])
         config['port'] = int(self.portNumberEntry.get())
         print('Local Port:', config['port'])
         config['sshport'] = int(self.sshPortEntry.get())
         print('SSH Port:', config['sshport'])
+        config['user'] = self.userEntry.get()
+        print('User:', config['user'])
         config['hostname'] = self.hostnameEntry.get()
         print('Hostname:', config['hostname'])
         conf.write_config(config)
@@ -79,15 +92,15 @@ class Application(ttk.Frame):
         pro.proxy_off()
         self.proxyOffButton['state'] = 'disabled'
         self.proxyOnButton['state'] = 'enabled'
-        
+
 #Initialise an instance of the configurator class
 conf = configurator.ConfigFile('./config.yml')
-config = conf.read_config() 
+config = conf.read_config()
 #Initialise an instance of the ProxyTools class
 pro = socks.ProxyTools(config['interface'])
 #Initialise an instance of the ssh tunnel class
 ssh_tunnel = ssh.Tunnel()
-#Method calls for window management
+
 #start the application if main
 if __name__ == '__main__':
     if platform.system() != 'Darwin':
