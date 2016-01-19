@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import io
 import yaml
+
+default = {'exists': True, 'interface': 'Wi-Fi', 'hostname': '104.131.190.99', 'ssh_id': '~/.ssh/id_rsa', 'sshport': 22 ,'port': 1080, 'user': 'root'}
+
 class ConfigFile(object):
     def __init__(self, path):
         """Constructor. Takes 1 argument, filepath"""
@@ -15,7 +18,7 @@ class ConfigFile(object):
         """Appends the current config, takes one argument"""
         yaml.dump(dict, self.file, default_flow_style=False)
     
-    def read_config(self):
+    def read_config(self): 
         """Reads the config and returns it as a dictionary"""
         self.file.seek(0)
         return yaml.load(self.file)
@@ -29,6 +32,7 @@ class ConfigFile(object):
             try:
                 self.file = io.open(self.path, 'a+t')
                 print("Config file does not exist -- Creating.")
+                self.write_config(default) 
             
             except IOError:
                 print("Error! Config file could not be read or written")
@@ -36,8 +40,7 @@ class ConfigFile(object):
 def main():
     f = ConfigFile('./config.yml')
     print(f.read_config())
-    f.write_config({'name': 'Silenthand Olleander', 'race': 'Human'})
-    f.append_config({'awen' : 'noodles'})
+    
 
 if __name__ == '__main__':
     main()

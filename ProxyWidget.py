@@ -5,15 +5,13 @@ from tkinter import ttk
 import tkinter.messagebox
 from modules import ssh 
 from modules import socks
+from modules import configurator
 
 #Global variables
-interface_name = 'Wi-Fi'
-hostname = '104.131.190.99'
-ssh_id_file = '/Users/awensaunders/.ssh/digitalocean.pem'
-sshport = 22
-port = 1080
-user = 'root'
 
+
+
+    
 #Main app logic
 class Application(ttk.Frame):
     def __init__(self, master=None):
@@ -42,42 +40,54 @@ class Application(ttk.Frame):
         self.optionsWindow = tk.Toplevel(self.master)
         self.optionsFrame = ttk.Frame(self.optionsWindow)
         self.optionsFrame.pack(fill = 'both', expand = 1, ipadx = 1, ipady = 1)
-        self.portLabel = ttk.Label(self.optionsFrame, text = 'Port Number:')
+        
+        self.portLabel = ttk.Label(self.optionsFrame, text = 'Local Port:')
         self.portNumberEntry = ttk.Entry(self.optionsFrame)
-        self.portNumberEntry.insert(0, port)
+        self.portNumberEntry.insert(0, config['port'])
         self.portLabel.pack(anchor = "w")
         self.portNumberEntry.pack()
         
-        self.hostLabel = ttk.Label(self.optionsFrame, text = 'Hostname:')
+        self.sshPortLabel = ttk.Label(self.optionsFrame, text = 'SSH Port:')
+        self.sshPortEntry = ttk.Entry(self.optionsFrame)
+        self.sshPortEntry.insert(0, config['sshport'])
+        self.sshPortLabel.pack(anchor = "w")
+        self.sshPortEntry.pack()
+        
+        self.hostnameLabel = ttk.Label(self.optionsFrame, text = 'Hostname:')
         self.hostnameEntry = ttk.Entry(self.optionsFrame)
-        self.hostnameEntry.insert(0, hostname)
-        self.hostLabel.pack(anchor = "w")
+        self.hostnameEntry.insert(0, config['hostname'])
+        self.hostnameLabel.pack(anchor = "w")
         self.hostnameEntry.pack()
         
         self.applyButton = ttk.Button(self.optionsFrame, text = 'Apply', command = self.apply_options, width = 4)
         self.applyButton.pack()
     def apply_options(self):
-        port = int(self.portNumberEntry.get())
-        print('Port Number:', port)
-        hostname = self.hostnameEntry.get()
-        print('Hostname:', hostname)
+        config['port'] = int(self.portNumberEntry.get())
+        print('Local Port:', config['port'])
+        config['sshport'] = int(self.sshPortEntry.get())
+        print('SSH Port:', config['sshport'])
+        config['hostname'] = self.hostnameEntry.get()
+        print('Hostname:', config['hostname'])
+        conf.write_config(config)
     def proxy_on(self):
         pro.proxy_on()
         self.proxyOnButton['state'] = 'disabled'
         self.proxyOffButton['state'] = 'enabled'
-        ssh_tunnel.start_tunnel(user, hostname, sshport, port, ssh_id_file)
+        ssh_tunnel.start_tunnel(config['user'], config['hostname'], config['sshport'], config['port'], config['ssh_id'])
     def proxy_off(self):
         ssh_tunnel.stop_tunnel()
         pro.proxy_off()
         self.proxyOffButton['state'] = 'disabled'
         self.proxyOnButton['state'] = 'enabled'
         
-        
-
+#Initialise an instance of the configurator class
+conf = configurator.ConfigFile('./config.yml')
+config = conf.read_config() 
 #Initialise an instance of the ProxyTools class
-pro = socks.ProxyTools(interface_name)
+pro = socks.ProxyTools(config['interface'])
 #Initialise an instance of the ssh tunnel class
 ssh_tunnel = ssh.Tunnel()
+#Method calls for window management
 #start the application if main
 if __name__ == '__main__':
     if platform.system() != 'Darwin':
@@ -85,8 +95,6 @@ if __name__ == '__main__':
     else:
         #Initialise the application
         app = Application()
-
-        #Method calls for window management
         app.master.title("Proxy Widget")
         app.master.maxsize(400, 400)
         #start the application
