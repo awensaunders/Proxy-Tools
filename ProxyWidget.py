@@ -62,14 +62,24 @@ class Application(ttk.Frame):
         self.userLabel.pack(anchor = "w")
         self.userEntry.pack()
         
+        self.idLabel = ttk.Label(self.optionsFrame, text = 'SSH Keyfile:')
+        self.chooseIdButton = ttk.Button(self.optionsFrame, text = 'Choose...', command = self.choose_id)
+        self.idLabel.pack(anchor = "w")
+        self.chooseIdButton.pack(anchor = "w")
+        
         self.hostnameLabel = ttk.Label(self.optionsFrame, text = 'Hostname:')
         self.hostnameEntry = ttk.Entry(self.optionsFrame)
         self.hostnameEntry.insert(0, config['hostname'])
         self.hostnameLabel.pack(anchor = "w")
         self.hostnameEntry.pack()
-        
-        self.applyButton = ttk.Button(self.optionsFrame, text = 'Apply', command = self.apply_options, width = 4)
-        self.applyButton.pack()
+        self.applyFrame = ttk.Frame(self.optionsFrame)
+        self.applyFrame.pack(fill = 'x', expand = 1, ipadx = 0, ipady = 0)
+        self.applyButton = ttk.Button(self.applyFrame, text = 'Apply', command = self.apply_options)
+        self.cancelButton = ttk.Button(self.applyFrame, text = 'Cancel', command = self.cancel)
+        self.applyButton.pack(side = 'right')
+        self.cancelButton.pack(side = 'right')
+    def cancel(self):
+        print('Dummy function for cancel.')
     def apply_options(self):
         config['interface'] = self.interfaceEntry.get()
         print('Interface:', config['interface'])
@@ -92,6 +102,8 @@ class Application(ttk.Frame):
         pro.proxy_off()
         self.proxyOffButton['state'] = 'disabled'
         self.proxyOnButton['state'] = 'enabled'
+    def choose_id(self):
+        print('Dummy function for SSH id choice.')
 
 #Initialise an instance of the configurator class
 conf = configurator.ConfigFile('./config.yml')
