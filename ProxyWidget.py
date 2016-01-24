@@ -3,6 +3,7 @@ import platform
 import tkinter as tk
 from tkinter import ttk
 import tkinter.messagebox
+from tkinter import filedialog
 from modules import ssh
 from modules import socks
 from modules import configurator
@@ -15,6 +16,7 @@ class Application(ttk.Frame):
         ttk.Frame.__init__(self, master)
         self.pack(fill = 'both', expand = 1, ipadx = 1, ipady = 1)
         self.mainWindowWidgets()
+    
     def mainWindowWidgets(self):
         self.quitButton = ttk.Button(self, text = 'Quit', command = self.quit, width = 8)
         self.proxyOnButton = ttk.Button(self, text = 'Proxy On', command = self.proxy_on, width = 8)
@@ -37,73 +39,94 @@ class Application(ttk.Frame):
         self.optionsWindow = tk.Toplevel(self.master)
         self.optionsFrame = ttk.Frame(self.optionsWindow)
         self.optionsFrame.pack(fill = 'both', expand = 1, ipadx = 1, ipady = 1)
+        self.optionsWindow.resizable(width=0, height=0)
         
         self.interfaceLabel = ttk.Label(self.optionsFrame, text = 'Interface:')
         self.interfaceEntry = ttk.Entry(self.optionsFrame)
         self.interfaceEntry.insert(0, config['interface'])
         self.interfaceLabel.pack(anchor = "w")
-        self.interfaceEntry.pack()
+        self.interfaceEntry.pack(fill = 'x')
         
         self.portLabel = ttk.Label(self.optionsFrame, text = 'Local Port:')
         self.portNumberEntry = ttk.Entry(self.optionsFrame)
         self.portNumberEntry.insert(0, config['port'])
         self.portLabel.pack(anchor = "w")
-        self.portNumberEntry.pack()
+        self.portNumberEntry.pack(fill = 'x')
         
         self.sshPortLabel = ttk.Label(self.optionsFrame, text = 'SSH Port:')
         self.sshPortEntry = ttk.Entry(self.optionsFrame)
         self.sshPortEntry.insert(0, config['sshport'])
         self.sshPortLabel.pack(anchor = "w")
-        self.sshPortEntry.pack()
+        self.sshPortEntry.pack(fill = 'x')
         
         self.userLabel = ttk.Label(self.optionsFrame, text = 'SSH User:')
         self.userEntry = ttk.Entry(self.optionsFrame)
         self.userEntry.insert(0, config['user'])
         self.userLabel.pack(anchor = "w")
-        self.userEntry.pack()
+        self.userEntry.pack(fill = 'x')
         
         self.idLabel = ttk.Label(self.optionsFrame, text = 'SSH Keyfile:')
-        self.chooseIdButton = ttk.Button(self.optionsFrame, text = 'Choose...', command = self.choose_id)
+        self.idFrame = ttk.Frame(self.optionsFrame)    
+        self.chooseIdButton = ttk.Button(self.idFrame, text = 'Choose...', command = self.choose_id)
+        self.idEntry = ttk.Entry(self.idFrame)
+        self.idEntry.insert(0, config['ssh_id'])
+        self.idEntry['state'] = 'disabled'
+        self.idEntry.pack(side = 'left')
         self.idLabel.pack(anchor = "w")
-        self.chooseIdButton.pack(anchor = "w")
+        self.idFrame.pack(fill = 'x', expand = 1, ipadx = 0, ipady = 0)
+        self.chooseIdButton.pack()
         
         self.hostnameLabel = ttk.Label(self.optionsFrame, text = 'Hostname:')
         self.hostnameEntry = ttk.Entry(self.optionsFrame)
         self.hostnameEntry.insert(0, config['hostname'])
         self.hostnameLabel.pack(anchor = "w")
-        self.hostnameEntry.pack()
+        self.hostnameEntry.pack(fill = 'x')
         self.applyFrame = ttk.Frame(self.optionsFrame)
         self.applyFrame.pack(fill = 'x', expand = 1, ipadx = 0, ipady = 0)
         self.applyButton = ttk.Button(self.applyFrame, text = 'Apply', command = self.apply_options)
         self.cancelButton = ttk.Button(self.applyFrame, text = 'Cancel', command = self.cancel)
         self.applyButton.pack(side = 'right')
         self.cancelButton.pack(side = 'right')
+    
     def cancel(self):
-        print('Dummy function for cancel.')
+        self.optionsWindow.destroy()
+    
     def apply_options(self):
         config['interface'] = self.interfaceEntry.get()
         print('Interface:', config['interface'])
         config['port'] = int(self.portNumberEntry.get())
         print('Local Port:', config['port'])
-        config['sshport'] = int(self.sshPortEntry.get())
-        print('SSH Port:', config['sshport'])
         config['user'] = self.userEntry.get()
         print('User:', config['user'])
+        config['sshport'] = int(self.sshPortEntry.get())
+        print('SSH Port:', config['sshport'])
+        config['ssh_id'] = self.idEntry.get
+        print('SSH keyfile:', config['ssh_id'])
         config['hostname'] = self.hostnameEntry.get()
         print('Hostname:', config['hostname'])
         conf.write_config(config)
+    
     def proxy_on(self):
         pro.proxy_on()
         self.proxyOnButton['state'] = 'disabled'
         self.proxyOffButton['state'] = 'enabled'
         ssh_tunnel.start_tunnel(config['user'], config['hostname'], config['sshport'], config['port'], config['ssh_id'])
+    
     def proxy_off(self):
         ssh_tunnel.stop_tunnel()
         pro.proxy_off()
         self.proxyOffButton['state'] = 'disabled'
         self.proxyOnButton['state'] = 'enabled'
+    
     def choose_id(self):
-        print('Dummy function for SSH id choice.')
+        self.ssh_id_path = filedialog.askopenfilename(initialdir = '~/.ssh/', message = 'Please select a keyfile')
+        if self.ssh_id_path:
+            self.idEntry['state'] = 'normal'
+            self.idEntry.insert(0, self.ssh_id_path)
+            self.idEntry['state'] = 'readonly'
+        else:
+            print('No file specified, using prior keyfile')
+        
 
 #Initialise an instance of the configurator class
 conf = configurator.ConfigFile('./config.yml')
